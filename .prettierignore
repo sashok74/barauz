@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+coverage
+.git
+*.lock
+package-lock.json
+playwright-report
+test-results
+packages/schema-types

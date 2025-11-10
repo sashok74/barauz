@@ -1,0 +1,19 @@
+{
+  "roles": [
+    {
+      "name": "manager",
+      "permissions": [
+        "sales_orders:read",
+        "sales_orders:create",
+        "sales_orders:update",
+        "sales_orders:delete",
+        "production:read",
+        "production:update"
+      ]
+    },
+    {
+      "name": "viewer",
+      "permissions": ["sales_orders:read", "production:read"]
+    }
+  ]
+}

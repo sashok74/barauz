@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "page.schema.json",
+  "title": "Page",
+  "description": "Page configuration with layout and blocks",
+  "type": "object",
+  "required": ["type", "id", "title", "layout", "blocks"],
+  "properties": {
+    "type": {
+      "const": "Page"
+    },
+    "id": {
+      "type": "string",
+      "description": "Unique page identifier"
+    },
+    "title": {
+      "type": "string",
+      "description": "Page title"
+    },
+    "layout": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": ["split", "tabs", "single"],
+          "description": "Layout type"
+        },
+        "ratio": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "description": "Layout ratio for split layout"
+        }
+      },
+      "additionalProperties": false
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "table.schema.json"
+          },
+          {
+            "$ref": "form.schema.json"
+          },
+          {
+            "type": "object",
+            "required": ["type", "id", "dataSource"],
+            "properties": {
+              "type": {
+                "const": "Gantt"
+              },
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "dataSource": {
+                "$ref": "datasource.schema.json"
+              }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": false
+}

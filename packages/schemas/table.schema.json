@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "table.schema.json",
+  "title": "Table",
+  "description": "Table component configuration",
+  "type": "object",
+  "required": ["type", "id", "dataSource", "columns"],
+  "properties": {
+    "type": {
+      "const": "Table"
+    },
+    "id": {
+      "type": "string",
+      "description": "Unique table identifier"
+    },
+    "title": {
+      "type": "string",
+      "description": "Table title"
+    },
+    "dataSource": {
+      "$ref": "datasource.schema.json"
+    },
+    "features": {
+      "type": "object",
+      "properties": {
+        "serverSide": {
+          "type": "boolean",
+          "description": "Enable server-side operations"
+        },
+        "inlineEdit": {
+          "type": "boolean",
+          "description": "Enable inline cell editing"
+        },
+        "exportExcel": {
+          "type": "boolean",
+          "description": "Enable Excel export"
+        },
+        "columnChooser": {
+          "type": "boolean",
+          "description": "Enable column visibility chooser"
+        }
+      },
+      "additionalProperties": false
+    },
+    "columns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["field", "header"],
+        "properties": {
+          "field": {
+            "type": "string",
+            "description": "Field name in data"
+          },
+          "header": {
+            "type": "string",
+            "description": "Column header text"
+          },
+          "width": {
+            "type": "number",
+            "description": "Column width in pixels"
+          },
+          "type": {
+            "enum": ["text", "number", "money", "date", "datetime", "badge"],
+            "description": "Column data type"
+          },
+          "pinned": {
+            "enum": ["left", "right"],
+            "description": "Pin column to left or right"
+          },
+          "editable": {
+            "type": "boolean",
+            "description": "Allow inline editing"
+          },
+          "editor": {
+            "enum": ["Text", "Number", "Date", "Select", "Autocomplete", "Checkbox"],
+            "description": "Cell editor component"
+          },
+          "lookup": {
+            "type": "string",
+            "description": "Lookup data source key for Select/Autocomplete"
+          },
+          "filter": {
+            "enum": ["text", "set", "number", "date"],
+            "description": "Filter type"
+          },
+          "agg": {
+            "enum": ["sum", "avg", "min", "max", "count"],
+            "description": "Aggregation function"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "rowActions": {
+      "type": "array",
+      "items": {
+        "$ref": "actions.schema.json#/definitions/action"
+      },
+      "description": "Actions for each row"
+    },
+    "bulkActions": {
+      "type": "array",
+      "items": {
+        "$ref": "actions.schema.json#/definitions/action"
+      },
+      "description": "Actions for selected rows"
+    }
+  },
+  "additionalProperties": false
+}

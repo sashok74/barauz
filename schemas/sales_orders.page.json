@@ -1,0 +1,126 @@
+{
+  "type": "Page",
+  "id": "sales_orders",
+  "title": "Заказы продаж",
+  "layout": {
+    "type": "split",
+    "ratio": [60, 40]
+  },
+  "blocks": [
+    {
+      "type": "Table",
+      "id": "ordersTable",
+      "title": "Список",
+      "dataSource": {
+        "key": "getSalesOrders",
+        "method": "GET",
+        "path": "/api/sales-orders",
+        "serverSide": true
+      },
+      "features": {
+        "serverSide": true,
+        "inlineEdit": true,
+        "exportExcel": true,
+        "columnChooser": true
+      },
+      "columns": [
+        {
+          "field": "code",
+          "header": "Код",
+          "width": 140,
+          "pinned": "left"
+        },
+        {
+          "field": "customer",
+          "header": "Клиент",
+          "editor": "Autocomplete",
+          "lookup": "customers"
+        },
+        {
+          "field": "status",
+          "header": "Статус",
+          "type": "badge",
+          "filter": "set",
+          "editable": true
+        },
+        {
+          "field": "amount",
+          "header": "Сумма",
+          "type": "money",
+          "agg": "sum"
+        },
+        {
+          "field": "eta",
+          "header": "ETA",
+          "type": "date",
+          "editable": true
+        }
+      ],
+      "rowActions": [
+        {
+          "label": "Открыть",
+          "icon": "edit",
+          "action": "openForm('orderForm',{id: row.id})"
+        },
+        {
+          "label": "Удалить",
+          "icon": "delete",
+          "confirm": true,
+          "action": "call('deleteOrder',{id: row.id})"
+        }
+      ],
+      "bulkActions": [
+        {
+          "label": "Утвердить",
+          "action": "call('bulkSetStatus',{ids: selectedIds, status: 'Approved'})"
+        }
+      ]
+    },
+    {
+      "type": "Form",
+      "id": "orderForm",
+      "title": "Заказ",
+      "dataSource": {
+        "key": "getOrderById",
+        "method": "GET",
+        "path": "/api/sales-orders/so-1"
+      },
+      "submit": {
+        "action": {
+          "action": "call('saveOrder',{data: form})"
+        },
+        "onSuccess": "refresh('ordersTable')"
+      },
+      "fields": [
+        {
+          "name": "code",
+          "label": "Код",
+          "component": "Text"
+        },
+        {
+          "name": "customerId",
+          "label": "Клиент",
+          "component": "Select",
+          "options": "customers",
+          "required": true
+        },
+        {
+          "name": "status",
+          "label": "Статус",
+          "component": "Select",
+          "options": ["Draft", "Approved", "Shipped"]
+        }
+      ],
+      "logic": [
+        {
+          "when": "{\"==\":[{\"var\":\"form.status\"},\"Shipped\"]}",
+          "then": [
+            {
+              "disable": ["customerId", "lines"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

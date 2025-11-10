@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "actions.schema.json",
+  "title": "Actions",
+  "description": "Action definitions for buttons and interactions",
+  "definitions": {
+    "action": {
+      "type": "object",
+      "required": ["label", "action"],
+      "properties": {
+        "icon": {
+          "type": "string",
+          "description": "Icon name (Material UI icon)"
+        },
+        "label": {
+          "type": "string",
+          "description": "Action label text"
+        },
+        "confirm": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show confirmation dialog before executing"
+        },
+        "action": {
+          "type": "string",
+          "description": "Action expression to execute"
+        }
+      },
+      "additionalProperties": false
+    },
+    "call": {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "Action expression to execute"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
