@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "form.schema.json",
+  "title": "Form",
+  "description": "Form component configuration",
+  "type": "object",
+  "required": ["type", "id", "dataSource", "fields", "submit"],
+  "properties": {
+    "type": {
+      "const": "Form"
+    },
+    "id": {
+      "type": "string",
+      "description": "Unique form identifier"
+    },
+    "title": {
+      "type": "string",
+      "description": "Form title"
+    },
+    "dataSource": {
+      "$ref": "datasource.schema.json"
+    },
+    "submit": {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "action": {
+          "$ref": "actions.schema.json#/definitions/call"
+        },
+        "onSuccess": {
+          "type": "string",
+          "description": "Action to execute on successful submit"
+        }
+      },
+      "additionalProperties": false
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "component", "label"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Field name"
+          },
+          "label": {
+            "type": "string",
+            "description": "Field label"
+          },
+          "component": {
+            "enum": ["Text", "Number", "Select", "Autocomplete", "Checkbox", "Date", "TableField"],
+            "description": "Input component type"
+          },
+          "required": {
+            "type": "boolean",
+            "description": "Mark field as required"
+          },
+          "options": {
+            "type": ["array", "string"],
+            "description": "Options for Select/Autocomplete (array or lookup key)"
+          },
+          "columns": {
+            "type": "array",
+            "description": "Column definitions for TableField"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "logic": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["when", "then"],
+        "properties": {
+          "when": {
+            "type": "string",
+            "description": "JSONLogic condition"
+          },
+          "then": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "description": "Actions to apply when condition is true"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Conditional logic rules"
+    }
+  },
+  "additionalProperties": false
+}

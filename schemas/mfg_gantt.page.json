@@ -1,0 +1,20 @@
+{
+  "type": "Page",
+  "id": "mfg_gantt",
+  "title": "Производственный ордер",
+  "layout": {
+    "type": "single"
+  },
+  "blocks": [
+    {
+      "type": "Gantt",
+      "id": "mo_gantt",
+      "title": "План работ",
+      "dataSource": {
+        "key": "getMoPlan",
+        "method": "GET",
+        "path": "/api/mfg-orders/1/gantt"
+      }
+    }
+  ]
+}

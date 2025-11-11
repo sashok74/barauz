@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "datasource.schema.json",
+  "title": "DataSource",
+  "description": "Data source configuration for fetching data from API",
+  "type": "object",
+  "required": ["key", "method", "path"],
+  "properties": {
+    "key": {
+      "type": "string",
+      "description": "Unique identifier for this data source"
+    },
+    "method": {
+      "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      "description": "HTTP method"
+    },
+    "path": {
+      "type": "string",
+      "description": "API endpoint path"
+    },
+    "params": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Query parameters or request body"
+    },
+    "serverSide": {
+      "type": "boolean",
+      "default": true,
+      "description": "Enable server-side pagination/filtering/sorting"
+    },
+    "transform": {
+      "type": "string",
+      "description": "JSONLogic expression to transform response data"
+    }
+  },
+  "additionalProperties": false
+}
