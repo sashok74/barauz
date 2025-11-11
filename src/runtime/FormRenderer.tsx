@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -22,6 +22,11 @@ import type { FormBlock, FormField } from '../dsl/types';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '../data/queryClient';
 import jsonLogic from 'json-logic-js';
+
+interface LookupOption {
+  id: string;
+  name: string;
+}
 
 interface FormRendererProps {
   schema: FormBlock;
@@ -62,6 +67,7 @@ function buildZodSchema(fields: FormField[]): z.ZodObject<Record<string, z.ZodTy
 
 export function FormRenderer({ schema }: FormRendererProps) {
   const zodSchema = buildZodSchema(schema.fields);
+  const [lookupData, setLookupData] = useState<Record<string, LookupOption[]>>({});
 
   const { data: initialData } = useQuery({
     queryKey: [schema.dataSource.key],
@@ -71,6 +77,38 @@ export function FormRenderer({ schema }: FormRendererProps) {
         path: schema.dataSource.path,
       }),
   });
+
+  // Load lookup data for fields with string options
+  useEffect(() => {
+    const loadLookups = async () => {
+      const lookupsToLoad = schema.fields.filter(
+        (field) => typeof field.options === 'string'
+      );
+
+      const lookupPromises = lookupsToLoad.map(async (field) => {
+        const lookupKey = field.options as string;
+        try {
+          const data = await apiRequest<LookupOption[]>({
+            method: 'GET',
+            path: `/api/lookups/${lookupKey}`,
+          });
+          return { key: lookupKey, data };
+        } catch (error) {
+          console.error(`Failed to load lookup ${lookupKey}:`, error);
+          return { key: lookupKey, data: [] };
+        }
+      });
+
+      const results = await Promise.all(lookupPromises);
+      const newLookupData: Record<string, LookupOption[]> = {};
+      results.forEach(({ key, data }) => {
+        newLookupData[key] = data;
+      });
+      setLookupData(newLookupData);
+    };
+
+    void loadLookups();
+  }, [schema.fields]);
 
   const {
     control,
@@ -171,7 +209,14 @@ export function FormRenderer({ schema }: FormRendererProps) {
           />
         );
 
-      case 'Select':
+      case 'Select': {
+        // Get options from either array or lookup data
+        const options = Array.isArray(field.options)
+          ? field.options.map((opt) => ({ id: String(opt), name: String(opt) }))
+          : typeof field.options === 'string'
+            ? lookupData[field.options] || []
+            : [];
+
         return (
           <Controller
             key={key}
@@ -187,17 +232,17 @@ export function FormRenderer({ schema }: FormRendererProps) {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
                   data-testid={`field-${field.name}` as any}
                 >
-                  {Array.isArray(field.options) &&
-                    field.options.map((opt) => (
-                      <MenuItem key={String(opt)} value={String(opt)}>
-                        {String(opt)}
-                      </MenuItem>
-                    ))}
+                  {options.map((opt) => (
+                    <MenuItem key={opt.id} value={opt.id}>
+                      {opt.name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             )}
           />
         );
+      }
 
       case 'Checkbox':
         return (
@@ -252,7 +297,14 @@ export function FormRenderer({ schema }: FormRendererProps) {
           />
         );
 
-      case 'Autocomplete':
+      case 'Autocomplete': {
+        // Get options from either array or lookup data
+        const options = Array.isArray(field.options)
+          ? field.options.map((opt) => ({ id: String(opt), name: String(opt) }))
+          : typeof field.options === 'string'
+            ? lookupData[field.options] || []
+            : [];
+
         return (
           <Controller
             key={key}
@@ -261,9 +313,15 @@ export function FormRenderer({ schema }: FormRendererProps) {
             render={({ field: controllerField }) => (
               <Autocomplete
                 {...controllerField}
-                options={Array.isArray(field.options) ? field.options.map(String) : []}
+                options={options}
+                getOptionLabel={(option) => {
+                  if (typeof option === 'string') return option;
+                  return (option as LookupOption).name;
+                }}
                 disabled={isDisabled}
-                onChange={(_, value) => controllerField.onChange(value)}
+                onChange={(_, value) =>
+                  controllerField.onChange(value ? (value as LookupOption).id : '')
+                }
                 renderInput={(params) => (
                   <TextField
                     {...params}
@@ -278,6 +336,7 @@ export function FormRenderer({ schema }: FormRendererProps) {
             )}
           />
         );
+      }
 
       default:
         return null;
