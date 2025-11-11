@@ -26,8 +26,8 @@ test.describe('Theme and i18n', () => {
 
     await ruOption.click();
 
-    // Should show Russian text
-    await expect(page.locator('text=Заказы продаж')).toBeVisible();
+    // Should show Russian text in page heading
+    await expect(page.getByRole('heading', { name: 'Заказы продаж' })).toBeVisible();
   });
 
   test('should switch language to English', async ({ page }) => {
@@ -43,8 +43,8 @@ test.describe('Theme and i18n', () => {
 
     await enOption.click();
 
-    // Should show English text
-    await expect(page.locator('text=Sales Orders')).toBeVisible();
+    // Should show English text in menu
+    await expect(page.locator('[data-testid="menu-sales-orders"]')).toContainText('Sales Orders');
   });
 
   test('should persist theme preference', async ({ page }) => {

@@ -4,8 +4,9 @@ test.describe('Navigation', () => {
   test('should display menu', async ({ page }) => {
     await page.goto('/');
 
-    const drawer = page.locator('[data-testid="drawer"]');
-    await expect(drawer).toBeVisible();
+    // Check menu items are present instead of drawer visibility
+    const salesOrdersMenu = page.locator('[data-testid="menu-sales-orders"]');
+    await expect(salesOrdersMenu).toBeVisible();
   });
 
   test('should toggle menu', async ({ page }) => {
